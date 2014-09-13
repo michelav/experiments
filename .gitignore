@@ -13,8 +13,15 @@ hs_err_pid*
 
 #binary files
 **/bin/
+**/build/
 **/output/
+
+#Generated files
+**/gen-hooks/
 
 #Eclipse Files
 .classpath
 .project
+
+#Gradle metainfo
+**/.gradle/

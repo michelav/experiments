@@ -1,0 +1,59 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://maven.eveoh.nl/content/repositories/releases"
+        }
+    }
+
+    dependencies {
+        classpath "nl.eveoh:gradle-aspectj:1.4"
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'http://repo1.maven.org/maven2'
+    }
+}
+
+ext {
+    genHooks = 'src/main/gen-hooks'
+    aspectjVersion = '1.8.2'
+    aspectName = 'GeneratedAspect'
+    destPackage = 'br.unifor.ppgia.detours.example'
+}
+
+apply plugin: 'aspectj'
+
+project.sourceSets.main.java {
+    srcDirs = ['src/main/java', 'src/main/aspects', genHooks]
+}
+
+dependencies {
+    ajInpath files('lib/threadsnfiles.jar')
+}
+
+def processPackage = {String myPack ->
+    def folder = myPack.replaceAll("\\.", "/")
+    return folder
+}
+
+task configure_hook(type:Copy) {
+    //outputs.dir genHooks
+
+    from 'templates'
+    include 'detours_aspect.gtpl'
+    into genHooks + "/" + processPackage(destPackage)
+    expand([
+        destpackage: 'br.unifor.ppgia.detours.example',
+        aspectName: aspectName,
+        detpoint: 'br.unifor.ppgia.filehandling.processor.*',
+        date: new Date()
+    ])
+    rename {file -> "${aspectName}.aj"}
+}
+
+compileAspect.dependsOn 'configure_hook'
+
