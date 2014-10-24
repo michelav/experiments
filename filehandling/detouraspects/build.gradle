@@ -1,5 +1,6 @@
 buildscript {
     repositories {
+        mavenLocal()
         mavenCentral()
         maven {
             url "https://maven.eveoh.nl/content/repositories/releases"
@@ -7,11 +8,12 @@ buildscript {
     }
 
     dependencies {
-        classpath "nl.eveoh:gradle-aspectj:1.4"
+        classpath "detours.aspect:gradle-aspectj:1.1"
     }
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven {
         url 'http://repo1.maven.org/maven2'
@@ -40,6 +42,10 @@ def processPackage = {String myPack ->
     return folder
 }
 
+task deleteGenerated(type:Delete) {
+    delete genHooks
+}
+
 task configure_hook(type:Copy) {
     //outputs.dir genHooks
 
@@ -55,5 +61,6 @@ task configure_hook(type:Copy) {
     rename {file -> "${aspectName}.aj"}
 }
 
-compileAspect.dependsOn 'configure_hook'
+// compileAspect.dependsOn 'configure_hook'
 
+clean.dependsOn 'deleteGenerated'
